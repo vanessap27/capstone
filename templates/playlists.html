@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>My Playlists:</h1>
+<head>
+    <title>My Playlists</title>
+    <style>
+        .playlist {
+            display: inline-block;
+            margin: 20px;
+            text-align: center;
+        }
+        .playlist img {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        a {
+            text-decoration: none;
+            color: #1DB954;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    {% if playlists %}
+        {% for playlist in playlists %}
+            <div class="playlist">
+                {% if playlist.image %}
+                    <img src="{{ playlist.image }}" alt="{{ playlist.name }}">
+                {% endif %}
+                <h3>{{ playlist.name }}</h3>
+                <button href="{{ playlist.url }}" target="_blank" class='btn btn-success mt-3'>Open in Spotify</button>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No playlists found.</p>
+    {% endif %}
+{% endblock %}

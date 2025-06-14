@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% for favs in favs %}
+    <p>{{favs}}</p>
+{% endfor %}
+<div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 20px;">
+    <button class="btn btn-lg btn-success">+</button>
+    <button class="btn btn-lg btn-danger">x</button>
+</div>
+
+{% endblock %}
