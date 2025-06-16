@@ -219,27 +219,5 @@ def create_playlist():
 
     return render_template("create.html")
 
-@app.route('/add')
-def add():
-    if 'access_token' not in session:
-        return redirect('/login')
-
-    if datetime.now().timestamp() > session['expires_at']:
-        return redirect('/refresh-token')
-
-    token = session["access_token"]
-
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    limit = 10
-    tracks_resp = requests.get(f'https://api.spotify.com/v1/me/top/tracks?limit={limit}', headers=headers)
-    top_tracks = tracks_resp.json().get('items', [])
-    track_uris = [f"spotify:track:{track['id']}" for track in top_tracks]
-
-    add_url  = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
-
-    return render_template('add.html', uri=add_url)
 if __name__ == "__main__":
     app.run(debug=True)
