@@ -1,0 +1,256 @@
+
+Works Cited
+"Authorization Code Flow." Spotify for Developers, developer.spotify.com/documentation/web-api/tutorials/code-flow.
+
+"CSS Flexbox." W3Schools Online Web Tutorials, www.w3schools.com/cssref/css3_pr_flex-grow.php.
+
+"HTML <strong> Tag." W3Schools Online Web Tutorials, www.w3schools.com/tags/tag_strong.asp.
+
+Imdad Codes. "Spotify API OAuth - Automate Getting User Playlists (Complete Tutorial)." 16 Sept. 2023, YouTube, youtu.be/olY_2MW4Eik. Accessed 6 June 2025.
+
+Imdad Codes. "The ONLY Spotify API Tutorial You'll Ever Need (Getting User Playlists)." 19 Feb. 2024, YouTube, youtu.be/2if5xSaZJlg. Accessed 5 June 2025.
+
+"Introducing Some Changes to Our Web API." Spotify for Developers, 27 Nov. 2024, developer.spotify.com/blog/2024-11-27-changes-to-the-web-api. Accessed 16 June 2025.
+
+"Introducing Some Changes to Our Web API." Spotify for Developers, developer.spotify.com/blog/2024-11-27-changes-to-the-web-api. Accessed 15 June 2025.
+
+"W3Schools.com." W3Schools Online Web Tutorials, www.w3schools.com/bootstrap/bootstrap_buttons.asp. Accessed 16 June 2025.
+
+"Web API Reference." Spotify for Developers, developer.spotify.com/documentation/web-api/reference/create-playlist.
+
+"Web API Reference." Spotify for Developers, developer.spotify.com/documentation/web-api/reference/get-recommendations.
+
+"Web API." Spotify for Developers, developer.spotify.com/documentation/web-api/.
+
+ 
+
+AI Tool Reesponses: 
+
+Q:when looking at the spotify developer request sample, am i supposed to look at curl, wget, httpie
+A:Great question! When looking at the Spotify Developer documentation, the request samples in different formats—curl, wget, httpie, etc.—are all just ways to demonstrate how you can make the API call from the command line using different tools. You don’t need to use any of them directly if you’re writing your app in Python (or another programming language).
+    Here’s a breakdown:
+
+    You should use:
+    None of those directly — if you're writing code in Python with requests, for example.
+
+    Instead, read the sample to understand:
+
+    The endpoint URL (e.g. https://api.spotify.com/v1/me/top/artists)
+
+    The required headers (usually with Authorization: Bearer <token>)
+
+    The query parameters (limit, time_range, etc.)
+
+    The expected response format (JSON)
+
+    Example: Converting a curl example to Python
+    Spotify might show this:
+
+    bash
+    Copy
+    Edit
+    curl -X "GET" "https://api.spotify.com/v1/me/top/artists?limit=10" \
+        -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+    You can translate that to Python like this:
+
+    python
+    Copy
+    Edit
+    import requests
+
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+    params = {
+        "limit": 10
+    }
+
+    response = requests.get("https://api.spotify.com/v1/me/top/artists", headers=headers, params=params)
+    data = response.json()
+    In short:
+    Look at curl to understand what the API expects, but implement the logic in your own code using Python's requests module or whatever your project is using.
+
+    Want a Python template for calling any Spotify API endpoint?
+
+Q: how is href used to redirect in html
+A:The href attribute stands for "hypertext reference." It's used in HTML to specify the destination (or URL) that a link points to.
+    In this context:
+    <a href="{{ url_for('swipe') }}">
+        <button>Go to Swipe Page</button>
+    </a>
+    The <a> tag is an anchor element—used to create a hyperlink.
+
+    href="{{ url_for('swipe') }}" tells the browser where to go when the link is clicked.
+
+    url_for('swipe') is a Flask function that dynamically generates the correct URL for the route associated with the swipe view (i.e., @app.route("/swipe")).
+
+    So, this code creates a button that links to the /swipe route of your app.
+
+    Example:
+    If your site is running at http://localhost:5000, and the swipe route is defined like:
+
+    @app.route("/swipe")
+    def swipe():
+        return render_template("swipe.html")
+    Then url_for('swipe') returns "/swipe", so the link will go to http://localhost:5000/swipe.
+
+Q: Why might my access token not validate 
+A: Scenario	What you do
+    Token missing	Redirect to /login
+    Token expired	Call refresh_token()
+    Refresh token missing or invalid	Redirect to /login
+    Token refresh successful	Continue to make requests
+    Spotify responds with 401 error	Clear session and redirect to /login
+
+Q: What is the Spotify API error: 403 
+A:A 403 error from the Spotify API means “Forbidden” – the request was authenticated (you had a token), but you don't have permission to access the resource. This is usually caused by one of the following:
+    🔍 Checklist to Fix Spotify API 403 Error:
+    ✅ 1. Scope Missing
+    If you're accessing me/playlists, you need these scopes:
+    playlist-read-private playlist-read-collaborative
+    Make sure your login flow uses all required scopes:
+
+    scope = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative'
+    Check that this is passed when generating the auth URL:
+
+    params = {
+        'client_id': CLIENT_ID,
+        'response_type': 'code',
+        'redirect_uri': REDIRECT_URI,
+        'scope': scope,
+        'show_dialog': True
+    }
+    ✅ 2. User Not Registered in App (New Spotify Apps)
+    Go to Spotify Developer Dashboard, open your app, and:
+
+    Check the "Users and Access" tab (for personal or restricted apps).
+
+    Make sure your Spotify account is added under “Users”.
+
+    If the app is in "development mode", only listed users can access it.
+
+    ✅ 3. Check for Expired or Invalid Token
+    Sometimes a 403 means your token isn't expired, but it's invalid.
+
+    Try refreshing your token by visiting your /refresh-token route explicitly.
+
+    ✅ 4. Make Sure the Authorization Header is Set Correctly
+    Double-check the access token header:
+
+    headers = {
+        'Authorization': f"Bearer {session['access_token']}"
+    }
+    If you're hardcoding or storing an old token, get a fresh one.
+
+    🔧 Bonus: Debug with the me endpoint
+    To test if your token works at all, try hitting the /me endpoint:
+
+
+    response = requests.get('https://api.spotify.com/v1/me', headers=headers)
+    print(response.status_code)
+    print(response.json())
+    If /me works (200), but /me/playlists fails (403), it's definitely a scope or access issue.
+
+    Want help inspecting your current token and scopes? I can help decode that too.
+
+Q:what are the params to get song recomendations
+A:To get song recommendations from the Spotify API, you use the /recommendations endpoint, which takes several optional and required query parameters.
+    Here are the key parameters:
+
+    🔑 Required Parameter:
+    Param	Description
+    seed_artists, seed_genres, or seed_tracks	You must provide at least one, and a maximum of 5 total combined. These are used as the "basis" for recommendations.
+
+    🎯 Optional Tuning Parameters:
+    These fine-tune the recommendations:
+
+    Param	Type	Description
+    limit	integer	Number of results to return (default: 20, max: 100).
+    market	string	Optional country code (e.g., "US") to filter available tracks.
+    min_<attribute> / max_<attribute> / target_<attribute>	float	Set desired track features like danceability, energy, tempo, etc.
+    🎵 Track Feature Filters:
+    You can fine-tune based on these audio features:
+    acousticness
+    danceability
+    duration_ms
+    energy
+    instrumentalness
+    key
+    liveness
+    loudness
+    mode
+    popularity
+    speechiness
+    tempo
+    time_signature
+    valence
+
+    Example:
+    GET https://api.spotify.com/v1/recommendations?seed_tracks=4NHQUGzhtTLFvgF5SZesLK&target_danceability=0.8
+
+Q; what features can you get from top track
+A: From Spotify's Top Tracks endpoint (/v1/me/top/tracks), each track object includes a rich set of information. Here’s what you can get for each top track:
+    🎵 Track-Level Information
+    Field	Description
+    name	Track name (e.g., “Blinding Lights”)
+    id	Spotify’s unique track ID
+    uri	Spotify URI (e.g., spotify:track:...)
+    popularity	Score from 0 to 100, based on play count
+    duration_ms	Duration of the track in milliseconds
+    explicit	Boolean, whether track has explicit lyrics
+    preview_url	30-second MP3 preview link
+    external_urls	Contains the Spotify web player URL
+
+    🎤 Artist Information
+    Each track includes a list of artists:
+    "artists": [
+    {
+        "name": "Drake",
+        "id": "3TVXtAsR1Inumwj472S9r4"
+    }
+    ]
+    Field	Description
+    name	Artist name
+    id	Unique Spotify ID
+    uri	Spotify URI
+    external_urls.spotify	Web link to the artist page
+    💿 Album Information
+    Each track also contains album info:
+    json
+    "album": {
+    "name": "Scorpion",
+    "release_date": "2018-06-29",
+    "images": [{ "url": "..." }]
+    }
+    Field	Description
+    name	Album title
+    release_date	Album release date
+    images	List of image objects (usually 3 sizes)
+
+    ✅ Example Fields You Can Display
+    You could show:
+    Track name
+    Artist(s) name(s)
+    Album name
+    Album cover
+    Popularity
+    Duration (convert ms to mm:ss)
+    Explicit or not
+    Preview URL (30-sec clip)
+
+    Link to play on Spotify
+    Want Audio Features Too?
+    You can get danceability, energy, tempo, etc. by calling:
+
+    GET https://api.spotify.com/v1/audio-features?ids={comma_separated_track_ids}
+    Let me know if you want to fetch and display those too!
+
+
+
+
+
+
+
+
+
+

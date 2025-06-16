@@ -139,9 +139,17 @@ def play():
         "Authorization": f"Bearer {token}",
     }
 
-    # Grab top tracks
+    #setting params 
     limit = 10
-    tracks_resp = requests.get(f'https://api.spotify.com/v1/me/top/tracks?limit={limit}', headers=headers)
+    time_range = request.form.get('time_range', 'short_term')
+    params = {
+        'short_term': 'Last Month',
+        'medium_term': 'Last 6 Months',
+        'long_term': 'All Time'
+    } 
+    # Grab top tracks
+    range_label = params.get(time_range, 'Last Month')
+    tracks_resp = requests.get(f'https://api.spotify.com/v1/me/top/tracks?time_range={time_range}&limit={limit}', headers=headers)
     top_tracks = tracks_resp.json().get('items', [])
     track_names = [track['name'] for track in top_tracks]
     track_artist = [track['artists'][0]['name'] for track in top_tracks]
@@ -155,9 +163,8 @@ def play():
     popularity_scores = [track['popularity'] for track in top_tracks]
     popularity_avg = sum(popularity_scores) / len(popularity_scores)
 
-    return render_template('play.html', artists=artist_names, tracks=track_names, track_artist=track_artist, popularity=popularity_avg)
+    return render_template('play.html', artists=artist_names, tracks=track_names, track_artist=track_artist, popularity=popularity_avg, range_label=range_label)
 
-@app.route("/create", methods=['GET', 'POST'])
 @app.route("/create", methods=['GET', 'POST'])
 def create_playlist():
     if 'access_token' not in session:
@@ -215,8 +222,7 @@ def create_playlist():
         if add_resp.status_code != 201:
             return f"Failed to add tracks: {add_resp.status_code} - {add_resp.text}"
 
-        return render_template("create.html", message="Playlist created and top tracks added!")
-
+        return redirect('/playlists')
     return render_template("create.html")
 
 if __name__ == "__main__":

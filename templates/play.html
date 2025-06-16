@@ -1,8 +1,5 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h1>Your Spotify Stats</h1>
-<a href="/create" class='btn btn-success mt-3'>Add Top Tracks To Playlist</a>
 
 <style>
     .flex-container {
@@ -32,6 +29,16 @@
       border: none;
     }
 </style>
+<h1>Your Spotify Stats</h1>
+
+
+<form method="POST" action="/play">
+  <div class="button-row">
+    <button type="submit" name="time_range" value="short_term" class="btn btn-success">Last Month</button>
+    <button type="submit" name="time_range" value="medium_term" class="btn btn-success">Last 6 Months</button>
+    <button type="submit" name="time_range" value="long_term" class="btn btn-success">All Time</button>
+  </div>
+</form>
 <div class="data-box">
     <h3>Taste Popularity: {{popularity}}</h3>
 
@@ -58,5 +65,6 @@
       </ul>
     </div>
   </div>
+<a href="/create" class='btn btn-success btn-lg' >Add Top Tracks To Playlist</a>
 
 {% endblock %}

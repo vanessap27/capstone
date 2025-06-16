@@ -32,10 +32,10 @@
         {% for playlist in playlists %}
             <div class="playlist">
                 {% if playlist.image %}
-                    <img src="{{ playlist.image }}" alt="{{ playlist.name }}">
+                    <img src="{{playlist.image}}" alt="{{ playlist.name }}">
                 {% endif %}
                 <h3>{{ playlist.name }}</h3>
-                <button href="{{ playlist.url }}" target="_blank" class='btn btn-success mt-3'>Open in Spotify</button>
+                <a href="{{playlist.url}}"><button target="_blank" class='btn btn-success mt-3'>Open in Spotify</button></a>
             </div>
         {% endfor %}
     {% else %}

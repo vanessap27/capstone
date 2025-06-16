@@ -1,2 +1,3 @@
 # capstone
  
+Melody is a web app made with Flask and Python that allows the user to view their Spotify analytics. The user will login using Spotify's authentication system, allowing the app to grab their personal data such as their top tracks, top artists, and the popularity of their msuic taste. The data can be filtered by a time range; one month, 6 months, and of all time. They can also add their top tracks to a new playlist which will show up on the "My Playlists" page as well as in their Spotify profile. 
