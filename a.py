@@ -138,14 +138,89 @@ def play():
     headers = {
         "Authorization": f"Bearer {token}",
     }
-    limit= 5
-    resp = requests.get(f'https://api.spotify.com/v1/me/top/artists?limit={limit}', headers=headers)
-    top_artists= resp.json()
-    return render_template('play.html', favs=top_artists['items'])
 
+    # Grab top tracks
+    limit = 10
+    tracks_resp = requests.get(f'https://api.spotify.com/v1/me/top/tracks?limit={limit}', headers=headers)
+    top_tracks = tracks_resp.json().get('items', [])
+    track_names = [track['name'] for track in top_tracks]
+    track_artist = [track['artists'][0]['name'] for track in top_tracks]
+    
+    # Grab top artists (you aren’t using this yet)
+    artists_resp = requests.get(f'https://api.spotify.com/v1/me/top/artists?limit={limit}', headers=headers)
+    top_artists = artists_resp.json().get('items', [])
+    artist_names = [artist['name'] for artist in top_artists]
+
+    # Average popularity (optional)
+    popularity_scores = [track['popularity'] for track in top_tracks]
+    popularity_avg = sum(popularity_scores) / len(popularity_scores)
+
+    return render_template('play.html', artists=artist_names, tracks=track_names, track_artist=track_artist, popularity=popularity_avg)
 
 @app.route("/create", methods=['GET', 'POST'])
+@app.route("/create", methods=['GET', 'POST'])
 def create_playlist():
+    if 'access_token' not in session:
+        return redirect('/login')
+
+    if datetime.now().timestamp() > session['expires_at']:
+        return redirect('/refresh-token')
+
+    token = session["access_token"]
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+
+    if request.method == 'POST':
+        playlist_name = request.form.get("playlist_name", "").strip()
+        description = request.form.get("description", "").strip()
+        public = "public" in request.form
+
+        if not playlist_name:
+            return render_template("create.html", message="Playlist name is required.")
+
+        # Step 1: Get User ID
+        user_resp = requests.get("https://api.spotify.com/v1/me", headers=headers)
+        if user_resp.status_code != 200:
+            return f"Failed to get user profile: {user_resp.status_code} - {user_resp.text}"
+
+        user_id = user_resp.json().get("id")
+        if not user_id:
+            return "Failed to retrieve Spotify user ID."
+
+        # Step 2: Create Playlist
+        create_url = f"https://api.spotify.com/v1/users/{user_id}/playlists"
+        data = {
+            "name": playlist_name or 'Top Tracks',
+            "public": public,
+            "description": description
+        }
+
+        create_resp = requests.post(create_url, headers=headers, json=data)
+        if create_resp.status_code != 201:
+            return f"Failed to create playlist: {create_resp.status_code} - {create_resp.text}"
+
+        playlist_id = create_resp.json().get("id")
+
+        # Step 3: Get Top Tracks
+        limit = 10
+        tracks_resp = requests.get(f'https://api.spotify.com/v1/me/top/tracks?limit={limit}', headers=headers)
+        top_tracks = tracks_resp.json().get('items', [])
+        track_uris = [f"spotify:track:{track['id']}" for track in top_tracks]
+
+        # Step 4: Add Tracks to Playlist
+        add_url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+        add_resp = requests.post(add_url, headers=headers, json={"uris": track_uris})
+        if add_resp.status_code != 201:
+            return f"Failed to add tracks: {add_resp.status_code} - {add_resp.text}"
+
+        return render_template("create.html", message="Playlist created and top tracks added!")
+
+    return render_template("create.html")
+
+@app.route('/add')
+def add():
     if 'access_token' not in session:
         return redirect('/login')
 
@@ -158,44 +233,13 @@ def create_playlist():
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json"
     }
+    limit = 10
+    tracks_resp = requests.get(f'https://api.spotify.com/v1/me/top/tracks?limit={limit}', headers=headers)
+    top_tracks = tracks_resp.json().get('items', [])
+    track_uris = [f"spotify:track:{track['id']}" for track in top_tracks]
 
-    if request.method == 'POST':
-        # Grabbing info from user input
-        playlist_name = request.form.get("playlist_name", "").strip()
-        description = request.form.get("description", "").strip()
-        public = "public" in request.form
+    add_url  = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
 
-        if not playlist_name:
-            return render_template("create.html", message="Playlist name is required.")
-
-        # Get user ID from Spotify
-        user_resp = requests.get("https://api.spotify.com/v1/me", headers=headers)
-        if user_resp.status_code != 200:
-            return f"Failed to get user profile: {user_resp.status_code} - {user_resp.text}"
-
-        user_id = user_resp.json().get("id")
-        if not user_id:
-            return "Failed to retrieve Spotify user ID."
-
-        # Create playlist
-        url = f"https://api.spotify.com/v1/users/{user_id}/playlists"
-        data = {
-            "name": playlist_name,
-            "public": public,
-            "description": description
-        }
-
-        response = requests.post(url, headers=headers, json=data)
-
-        if response.status_code == 201:
-            return render_template('create.html', message="Playlist created!")
-        else:
-            return redirect('/login')
-            # return f"Error: {response.status_code} - {response.text}"
-
-    return render_template("create.html")
-
-
-
+    return render_template('add.html', uri=add_url)
 if __name__ == "__main__":
     app.run(debug=True)

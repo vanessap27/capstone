@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
+
 <form action="/create" method="POST">
-    <div>
+    
+    <div style="text-align: center;">
         <h2><label for="playlist_name">Playlist Name:</label></h2>
         <input type="text" id="playlist_name" name="playlist_name" required>
     </div>  
-    <div>
+    <div style="text-align: center;">
         <h2><label for="description">Description (optional):</label></h2>
         <input type="text" id="description" name="description">
     </div>
-        <button type="submit" class='btn btn-success mt-3'>Create Playlist</button>
+       <p style="text-align: center;"><a href="/add"><button type="submit" class='btn btn-success mt-3'>Create Playlist</button></a></p>
 </form>
 {% endblock %}

@@ -1,12 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% for favs in favs %}
-    <p>{{favs}}</p>
-{% endfor %}
-<div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 20px;">
-    <button class="btn btn-lg btn-success">+</button>
-    <button class="btn btn-lg btn-danger">x</button>
+<h1>Your Spotify Stats</h1>
+<a href="/create" class='btn btn-success mt-3'>Add Top Tracks To Playlist</a>
+
+<style>
+    .flex-container {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .data-box {
+      flex: 1 1 45%;
+      border: 1px solid #ccc;
+      padding: 1rem;
+      border-radius: 4px;
+      background: #fafafa;
+      box-sizing: border-box;
+    }
+    .data-box h2 {
+      margin-top: 0;
+    }
+    .data-box ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .data-box li {
+      margin: 0.25rem 0;
+      padding: 0;
+      border: none;
+    }
+</style>
+<div class="data-box">
+    <h3>Taste Popularity: {{popularity}}</h3>
+
 </div>
+  <div class="flex-container">
+    <div class="data-box">
+      <h3>Top Artists:</h3>
+      <ul>
+        {% for artist in artists %}
+          <li>{{ artist }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="data-box">
+      <h3>Top Tracks:</h3>
+      <ul>
+        {% for track in tracks %}
+          <li>
+            <strong>{{ track }}</strong><br/>
+            by {{ track_artist[loop.index0] }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 
 {% endblock %}
