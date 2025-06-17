@@ -155,7 +155,7 @@ def play():
     track_artist = [track['artists'][0]['name'] for track in top_tracks]
     
     # Grab top artists (you aren’t using this yet)
-    artists_resp = requests.get(f'https://api.spotify.com/v1/me/top/artists?limit={limit}', headers=headers)
+    artists_resp = requests.get(f'https://api.spotify.com/v1/me/top/artists?time_range={time_range}&limit={limit}', headers=headers)
     top_artists = artists_resp.json().get('items', [])
     artist_names = [artist['name'] for artist in top_artists]
 
